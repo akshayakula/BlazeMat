@@ -44,7 +44,7 @@ export default function AuthNavbar(props) {
   });
   var list = (
     <List className={classes.list}>
-      <ListItem className={classes.listItem}>
+      {/* <ListItem className={classes.listItem}>
         <NavLink to={"/admin/dashboard"} className={classes.navLink}>
           <Dashboard className={classes.listItemIcon} />
           <ListItemText
@@ -53,8 +53,8 @@ export default function AuthNavbar(props) {
             className={classes.listItemText}
           />
         </NavLink>
-      </ListItem>
-      <ListItem className={classes.listItem}>
+      </ListItem> */}
+      {/* <ListItem className={classes.listItem}>
         <NavLink
           to={"/auth/pricing-page"}
           className={cx(classes.navLink, {
@@ -68,7 +68,7 @@ export default function AuthNavbar(props) {
             className={classes.listItemText}
           />
         </NavLink>
-      </ListItem>
+      </ListItem> */}
       <ListItem className={classes.listItem}>
         <NavLink
           to={"/auth/register-page"}
@@ -99,7 +99,7 @@ export default function AuthNavbar(props) {
           />
         </NavLink>
       </ListItem>
-      <ListItem className={classes.listItem}>
+      {/* <ListItem className={classes.listItem}>
         <NavLink
           to={"/auth/lock-screen-page"}
           className={cx(classes.navLink, {
@@ -113,7 +113,7 @@ export default function AuthNavbar(props) {
             className={classes.listItemText}
           />
         </NavLink>
-      </ListItem>
+      </ListItem> */}
     </List>
   );
   return (
@@ -122,14 +122,14 @@ export default function AuthNavbar(props) {
         <Hidden smDown>
           <div className={classes.flex}>
             <Button href="#" className={classes.title} color="transparent">
-              {brandText}
+              Blazesell
             </Button>
           </div>
         </Hidden>
         <Hidden mdUp>
           <div className={classes.flex}>
             <Button href="#" className={classes.title} color="transparent">
-              MD Pro React
+              Blazesell
             </Button>
           </div>
         </Hidden>

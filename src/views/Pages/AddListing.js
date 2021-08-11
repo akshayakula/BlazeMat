@@ -29,8 +29,16 @@ import styles from "assets/jss/material-dashboard-pro-react/views/userProfileSty
 import Dropzone from "components/CustomUpload/listingForm"
 import avatar from "assets/img/faces/marc.jpg";
 import axios from "axios"
+import SweetAlert from "react-bootstrap-sweetalert";
+
+import alertStyles from "assets/jss/material-dashboard-pro-react/views/sweetAlertStyle.js";
+
+
 const useStyles = makeStyles(styles);
 const api_url = process.env.REACT_APP_API_URL;
+const useAlertStyles = makeStyles(alertStyles)
+
+
 export default function AddListing() {
   
   const {info, setInfo} = useContext(UserContext);
@@ -48,11 +56,33 @@ export default function AddListing() {
 
   const [images, setImages] = useState([])
 
+  const [alert, setAlert] = useState(null);
+
+  const alertClasses = useAlertStyles();
+
+  const hideAlert = () => {
+    setAlert(null);
+  };
+  const successAlert = () => {
+    setAlert(
+      <SweetAlert
+        success
+        style={{ display: "block", marginTop: "-100px"}}
+        title="Listing Added!"
+        onConfirm={() => {hideAlert()}}
+        onCancel={() => {hideAlert()}}
+        confirmBtnCssClass={alertClasses.button + " " + alertClasses.success}
+      >
+      </SweetAlert>
+    );
+  };
+
+
   const handleSubmit = async (event) => {
 
     event.preventDefault()
     let bodyFormData = new FormData();
-
+    console.log('Submit Pressed')
     bodyFormData.append('name', name)
     bodyFormData.append('time_limit', time)
     bodyFormData.append('first_name', firstName)
@@ -79,14 +109,17 @@ export default function AddListing() {
     }
     catch(err){
       console.log(err)
-      if(err.response.status = 403) 
+      if(err.response.status = 403){
         history.push('/auth/login')
+      }
+      return
     }
-
+    successAlert();
   }
 
   return (
     <div>
+      <div className={classes.sweetAlert}> {alert} </div>
       <GridContainer>
         <GridItem xs={12} sm={12} md={12}>
           <Card>

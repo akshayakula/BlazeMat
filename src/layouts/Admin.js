@@ -28,6 +28,7 @@ export default function Dashboard(props) {
 
   const { ...rest } = props;
   // states and functions
+  const sideRoutes = [routes[0], routes[1], routes[2], routes[3], routes[4], routes[5]]
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [miniActive, setMiniActive] = React.useState(false);
   // const [image, setImage] = React.useState(
@@ -155,7 +156,7 @@ export default function Dashboard(props) {
   return (
     <div className={classes.wrapper}>
       <Sidebar
-        routes={routes}
+        routes={sideRoutes}
         logoText={"Blazesell"}
         logo={logo}
         image={image}

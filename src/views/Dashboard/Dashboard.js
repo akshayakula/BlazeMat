@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import {Link} from 'react-router-dom'
+import { Link, useHistory} from 'react-router-dom'
 // react plugin for creating charts
 // import ChartistGraph from "react-chartist";
 // react plugin for creating vector maps
@@ -36,6 +36,7 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
+import axios from "axios"
 
 // import {
 //   dailySalesChart,
@@ -49,6 +50,7 @@ import priceImage1 from "assets/img/card-2.jpeg";
 import priceImage2 from "assets/img/card-3.jpeg";
 import priceImage3 from "assets/img/card-1.jpeg";
 import { UserContext } from "UserContext";
+import { HeadsetMic } from "@material-ui/icons";
 
 // const us_flag = require("assets/img/flags/US.png").default;
 // const de_flag = require("assets/img/flags/DE.png").default;
@@ -72,16 +74,68 @@ import { UserContext } from "UserContext";
 // };
 
 const useStyles = makeStyles(styles);
+const api_url = process.env.REACT_APP_API_URL;
+
 
 export default function Dashboard() {
   
-  const {info, listings, setListings, fetchUserInfo} = useContext(UserContext)
+  const {info, listings, setListings} = useContext(UserContext)
   const classes = useStyles();
-
+  let history = useHistory()
 
   const [item1, setItem1] = useState(listings.dataRows[0])
   const [item2, setItem2] = useState(listings.dataRows[1])
   const [item3, setItem3] = useState(listings.dataRows[2])
+
+  const fetchUserListings = async () => {
+    console.log("TABLES FETCHING Listings")
+    // console.log(token)
+
+    const headers = {
+        headers: {
+          'Authorization': localStorage.getItem('BSIdToken')
+        }
+    }
+
+    let r;
+    try{
+        r = await axios.get(`${api_url}/getListings`, headers)
+    }
+    catch(err){
+        console.log(err)
+        console.log('Session Expired Info Fetch failed')
+        // localStorage.removeItem('BSIdToken')
+        history.push('/auth/login')
+        return; 
+    }
+
+    console.log('Fetching User Listings')
+    //console.log(r.data.data)
+    let arrListings = [];
+    r.data.data.forEach(element => {
+        const tempListing = []
+        tempListing.push(element.info.name)
+        tempListing.push(element.info.price_target)
+        tempListing.push(element.info.status)
+        tempListing.push(element.info.time_estimate)
+        tempListing.push(element.id)
+        tempListing.push(element.info.imageUrls)
+        // console.log(tempListing)
+        arrListings.push(tempListing)
+    })
+
+    const newListings = listings
+    newListings.dataRows = arrListings
+    setListings(newListings)
+  }
+  
+  useEffect( () => {
+    
+    setItem1(listings.dataRows[0])
+    setItem2(listings.dataRows[1])
+    setItem3(listings.dataRows[2])
+    fetchUserListings()
+  })
 
   return (
     <div>
@@ -135,7 +189,8 @@ export default function Dashboard() {
           </Card>
         </GridItem>
       </GridContainer>
-      <h3>Recent Listings</h3>
+      <h3>Recent Listings</h3> <Button onClick={event => handleRefresh(event)}> Refresh </Button>
+      <br />
       <br />
       <GridContainer>
       {item1 ? null :

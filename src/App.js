@@ -66,6 +66,9 @@ export const App = () => {
         catch(err){
             console.log('Session Expired Info Fetch failed')
             //localStorage.removeItem('BSIdToken')
+            if(err.response.status = 403){
+                history.push('/auth/login')
+            }
             return;
         }
         console.log('Fetching User Info')
@@ -128,8 +131,12 @@ export const App = () => {
             <Switch>
                 {/* <AuthContext.Provider value={{token, setToken}}> */}
                     <UserContext.Provider value={{info, setInfo,listings, setListings, token, setToken}}>
-                        <Route path="/auth" component={AuthLayout} />
-                        <Route path="/admin" component={AdminLayout} />
+                        <Route path="/auth">
+                            <AuthLayout />
+                        </Route>
+                        <Route path="/admin">
+                            <AdminLayout/>
+                        </ Route>
                         <Route path='/terms' exact component={Terms} />
                         <Route path='/' exact component = {Landing} />
                         {/* <Redirect from="*" to='/auth/login' /> */}

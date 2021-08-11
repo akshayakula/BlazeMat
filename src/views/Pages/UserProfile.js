@@ -153,6 +153,17 @@ export default function UserProfile() {
   const [street, setStreet] = useState(info.street)
   const [alert, setAlert] = useState(null);
 
+  // const baseInfo = 
+
+  const [savedInfo, setSavedInfo] = useState({
+    zipcode: zipcode,
+    firstName: firstName,
+    lastName: lastName,
+    city: city,
+    street: street,
+    alert: alert
+  })
+
   useEffect( () =>{
 
     setZipcode(info.zip_code)
@@ -178,12 +189,11 @@ export default function UserProfile() {
       <SweetAlert
         success
         style={{ display: "block", marginTop: "-100px"}}
-        title="Check Emails from:"
+        title="Profile Updated!"
         onConfirm={() => {hideAlert()}}
         onCancel={() => {hideAlert()}}
         confirmBtnCssClass={alertClasses.button + " " + alertClasses.success}
       >
-      noreply@blazesell-84604.firebaseapp.com
       </SweetAlert>
     );
   };
@@ -192,7 +202,7 @@ export default function UserProfile() {
     event.preventDefault()
     localStorage.removeItem('BSIdToken')
     history.push('/auth/login')
-    // successAlert()
+    
   }
 
   const handleSave = async (event) => {
@@ -227,6 +237,15 @@ export default function UserProfile() {
 
     console.log("New user looks like" + r.data)
     setInfo(r.data)
+    setSavedInfo(({
+      zipcode: zipcode,
+      firstName: firstName,
+      lastName: lastName,
+      city: city,
+      street: street,
+      alert: alert
+    }))
+    successAlert()
   }
 
 
@@ -352,10 +371,10 @@ export default function UserProfile() {
             </CardAvatar>
             <CardBody profile>
               <h6 className={classes.cardCategory}>{email}</h6>
-              <h4 className={classes.cardTitle}>{firstName} {lastName} </h4>
-              {street && city ? <p>{street}<br/>{city}, {getState(zipcode)}<br/>{zipcode}</p> : <p className={classes.description}>
-                {getState(zipcode)}, {zipcode}
-              </p> }
+              <h4 className={classes.cardTitle}>{savedInfo.firstName} {savedInfo.lastName} </h4>
+              {savedInfo.zipcode ? (savedInfo.street && savedInfo.city ? <p>{savedInfo.street}<br/>{savedInfo.city}, {getState(savedInfo.zipcode)}<br/>{savedInfo.zipcode}</p> : <p className={classes.description}>
+                {getState(savedInfo.zipcode)}, {savedInfo.zipcode}
+              </p>) : null}
 
               <Button color="rose" round onClick={event => handleSignOut(event)}> 
                 Sign Out

@@ -114,6 +114,11 @@ export default function AddListing() {
       }
       return
     }
+
+    setName("")
+    setTime("")
+    setDescription("")
+    setImages([])
     successAlert();
   }
 
@@ -128,7 +133,7 @@ export default function AddListing() {
                 <PermIdentity />
               </CardIcon>
               <h4 className={classes.cardIconTitle}>
-                Add Listing<small>/ Edit Listing</small>
+                Add Listing<small></small>
               </h4>
             </CardHeader>
             <CardBody>

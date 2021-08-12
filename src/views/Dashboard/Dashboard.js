@@ -189,8 +189,7 @@ export default function Dashboard() {
           </Card>
         </GridItem>
       </GridContainer>
-      <h3>Recent Listings</h3> <Button onClick={event => handleRefresh(event)}> Refresh </Button>
-      <br />
+      <h3>Recent Listings</h3>
       <br />
       <GridContainer>
       {item1 ? null :

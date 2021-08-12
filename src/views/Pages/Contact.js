@@ -63,7 +63,7 @@ export default function Contact(props) {
             <Card>
                 <CardHeader>
                 <h4 className={classes.cardTitle}>
-                    Navigation Pills Icons <small> - Vertical Tabs</small>
+                    Contact Us <small> - We'll do our best to help!</small>
                 </h4>
                 </CardHeader>
                 <CardBody>

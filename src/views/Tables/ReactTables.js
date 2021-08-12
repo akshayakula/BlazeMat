@@ -16,10 +16,14 @@ import CardBody from "components/Card/CardBody.js";
 import CardIcon from "components/Card/CardIcon.js";
 import CardHeader from "components/Card/CardHeader.js";
 import ReactTable from "components/ReactTable/ReactTable.js";
+import SweetAlert from "react-bootstrap-sweetalert";
 import axios from "axios"
 import { dataTable } from "variables/general.js";
 import { UserContext } from "../../UserContext"
 import { cardTitle } from "assets/jss/material-dashboard-pro-react.js";
+import alertStyles from "assets/jss/material-dashboard-pro-react/views/sweetAlertStyle.js";
+
+const useAlertStyles = makeStyles(alertStyles)
 
 const styles = {
   cardIconTitle: {
@@ -42,6 +46,141 @@ export default function ReactTables() {
   let history = useHistory()
 
 
+  const [alert, setAlert] = useState(null);
+  const alertClasses = useAlertStyles();
+
+  const hideAlert = () => {
+    setAlert(null);
+  };
+
+  const alertAcceptCancelReject = (price, time, docId) => {
+    console.log(price)
+    setAlert(
+      <SweetAlert
+        warning
+        style={{ display: "block", marginTop: "-100px" }}
+        title={`We Will Pay You $${price}!`}
+
+        customButtons={
+          <div>
+            <Button onClick={ () => hideAlert()}>Cancel</Button>
+            <Button color="danger" onClick={ () => RejectOfferAlert(docId)} >Reject</Button>
+            <Button color="success" onClick={ () => AcceptOffer(docId)} >Accept</Button>
+          </div>
+        }
+        showCancel
+      >
+        You will need to send the item between now and {time}
+      </SweetAlert>
+    );
+  };
+  const AcceptOffer = async (docId) => {
+
+    const headers = {
+      headers: {
+        'Authorization': localStorage.getItem('BSIdToken')
+      }
+    }
+
+    const payload = {
+      "docId": docId
+    }
+
+    let r;
+    try{
+      r = await axios.post(`${api_url}/acceptListing`, payload, headers)
+    }
+    catch (err) {
+      console.log(err)
+    }
+    fetchUserListings()
+
+    setAlert(
+      <SweetAlert
+        success
+        style={{ display: "block", marginTop: "-100px" }}
+        title="Congratulations!"
+        onConfirm={() => hideAlert()}
+        onCancel={() => hideAlert()}
+        confirmBtnCssClass={classes.button + " " + classes.success}
+      >
+        The Amount will be added to your balance!
+      </SweetAlert>
+    );
+  };
+  const RejectOfferAlert = async(docId) => {
+    const headers = {
+      headers: {
+        'Authorization': localStorage.getItem('BSIdToken')
+      }
+    }
+
+    const payload = {
+      "docId": docId
+    }
+
+    let r;
+    try{
+      r = await axios.post(`${api_url}/rejectListing`, payload, headers)
+    }
+    catch (err) {
+      console.log(err)
+    }
+    fetchUserListings()
+
+    setAlert(
+      <SweetAlert
+        danger
+        style={{ display: "block", marginTop: "-100px" }}
+        title="Offer Rejected"
+        onConfirm={() => hideAlert()}
+        onCancel={() => hideAlert()}
+        confirmBtnCssClass={classes.button + " " + classes.success}
+      >
+        This Item will be marked as Inactive Rejected
+      </SweetAlert>
+    );
+  };
+  const successAlert = (e) => {
+    setAlert(
+      <SweetAlert
+        success
+        style={{ display: "block", marginTop: "-100px"}}
+        title="Item Deleted"
+        onConfirm={() => hideAlert()}
+        onCancel={() => hideAlert()}
+        confirmBtnCssClass={alertClasses.button + " " + alertClasses.success}
+      >
+      </SweetAlert>
+    );
+  };
+
+
+  const removeListing = async (docId) => {
+    const headers = {
+      headers: {
+        'Authorization': localStorage.getItem('BSIdToken')
+      }
+    }
+
+    const payload = {
+      "docId": docId
+    }
+
+    let r;
+    try{
+      r = await axios.post(`${api_url}/removeListing`,payload , headers)
+    }
+    catch (err) {
+      console.log(err)
+      history.push('/auth/login')
+    }
+    fetchUserListings()
+    successAlert()
+
+  }
+
+
   const fetchUserListings = async () => {
     console.log("TABLES FETCHING Listings")
     // console.log(token)
@@ -60,7 +199,7 @@ export default function ReactTables() {
         console.log(err)
         console.log('Session Expired Info Fetch failed')
         // localStorage.removeItem('BSIdToken')
-        history.push('/auth/login')
+        history.push('/auth/login-page')
         return; 
     }
 
@@ -88,53 +227,27 @@ export default function ReactTables() {
         return {
           id: key,
           name: prop[0],
-          price_target: prop[1],
+          price: `$${prop[1]}`,
           status: prop[2],
           time_estimate: prop[3],
           actions: (
             // we've added some custom button actions
             <div className="actions-right">
-              <Button
-                justIcon
+              {prop[2] === "Active Offer" ? <Button
                 round
-                simple
-                onClick={() => {
-                  let obj = data.find((o) => o.id === key);
-                  alert(
-                    "You've clicked EDIT button on \n{ \nName: " +
-                      obj.name +
-                      ", \nPrice Target: " +
-                      obj.price_target +
-                      ", \nStatus: " +
-                      obj.status +
-                      ", \nTime Estimate: " +
-                      obj.time_estimate +
-                      "\n}."
-                  );
-                }}
+                onClick={() => {alertAcceptCancelReject(prop[1],prop[3],prop[4])}}
                 color="warning"
                 className="edit"
               >
-                <Edit />
-              </Button>{" "}
+                Check Offer
+              </Button> : null}
+
               {/* use this button to remove the data row */}
               <Button
                 justIcon
                 round
                 simple
-                onClick={() => {
-                  var newData = data;
-                  newData.find((o, i) => {
-                    if (o.id === key) {
-                      // here you should add some custom code so you can delete the data
-                      // from this component and from your server as well
-                      newData.splice(i, 1);
-                      return true;
-                    }
-                    return false;
-                  });
-                  setData([...newData]);
-                }}
+                onClick={(event) => {console.log(prop[4]); removeListing(prop[4])} }
                 color="danger"
                 className="remove"
               >
@@ -154,53 +267,27 @@ export default function ReactTables() {
         return {
           id: key,
           name: prop[0],
-          price_target: prop[1],
+          price: `$${prop[1]}`,
           status: prop[2],
           time_estimate: prop[3],
           actions: (
             // we've added some custom button actions
             <div className="actions-right">
-              <Button
-                justIcon
+              {prop[2] === "Active Offer" ? <Button
                 round
-                simple
-                onClick={() => {
-                  let obj = data.find((o) => o.id === key);
-                  alert(
-                    "You've clicked EDIT button on \n{ \nName: " +
-                      obj.name +
-                      ", \nPrice Target: " +
-                      obj.price_target +
-                      ", \nStatus: " +
-                      obj.status +
-                      ", \nTime Estimate: " +
-                      obj.time_estimate +
-                      "\n}."
-                  );
-                }}
+                onClick={() => {alertAcceptCancelReject(prop[1],prop[3],prop[4])}}
                 color="warning"
                 className="edit"
               >
-                <Edit />
-              </Button>{" "}
+                Check Offer
+              </Button> : null}
+
               {/* use this button to remove the data row */}
               <Button
                 justIcon
                 round
                 simple
-                onClick={() => {
-                  var newData = data;
-                  newData.find((o, i) => {
-                    if (o.id === key) {
-                      // here you should add some custom code so you can delete the data
-                      // from this component and from your server as well
-                      newData.splice(i, 1);
-                      return true;
-                    }
-                    return false;
-                  });
-                  setData([...newData]);
-                }}
+                onClick={(event) => {console.log(prop[4]); removeListing(prop[4])} }
                 color="danger"
                 className="remove"
               >
@@ -219,44 +306,49 @@ export default function ReactTables() {
 
   const classes = useStyles();
   return (
-    <GridContainer>
-      <GridItem xs={12}>
-        <Card>
-          <CardHeader color="primary" icon>
-            <CardIcon color="primary">
-              <Assignment />
-            </CardIcon>
-            <h4 className={classes.cardIconTitle}>Items</h4>
-          </CardHeader>
-          <CardBody>
-            {data ? <ReactTable
-              columns={[
-                {
-                  Header: "Name",
-                  accessor: "name",
-                },
-                {
-                  Header: "Price Target",
-                  accessor: "price_target",
-                },
-                {
-                  Header: "Status",
-                  accessor: "status",
-                },
-                {
-                  Header: "Time Estimate",
-                  accessor: "time_estimate",
-                },
-                {
-                  Header: "Actions",
-                  accessor: "actions",
-                },
-              ]}
-              data={data}
-            /> : null}
-          </CardBody>
-        </Card>
-      </GridItem>
-    </GridContainer>
+    <div>
+      
+      <div className={classes.sweetAlert}> {alert} </div>
+
+      <GridContainer>
+        <GridItem xs={12}>
+          <Card>
+            <CardHeader color="primary" icon>
+              <CardIcon color="primary">
+                <Assignment />
+              </CardIcon>
+              <h4 className={classes.cardIconTitle}>Items</h4>
+            </CardHeader>
+            <CardBody>
+              {data ? <ReactTable
+                columns={[
+                  {
+                    Header: "Name",
+                    accessor: "name",
+                  },
+                  {
+                    Header: "Offer",
+                    accessor: "price",
+                  },
+                  {
+                    Header: "Status",
+                    accessor: "status",
+                  },
+                  {
+                    Header: "Time Estimate",
+                    accessor: "time_estimate",
+                  },
+                  {
+                    Header: "Actions",
+                    accessor: "actions",
+                  },
+                ]}
+                data={data}
+              /> : null}
+            </CardBody>
+          </Card>
+        </GridItem>
+      </GridContainer>
+    </div>
   );
 }

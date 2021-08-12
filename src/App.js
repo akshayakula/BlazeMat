@@ -41,8 +41,8 @@ export const App = () => {
     const [info, setInfo] = useState(baseInfo)
     const [AppTrigger, setAppTrigger] = useState(false)
     const [listings, setListings] = useState({
-        headerRow: ["Name", "Price Target", "Status", "Time Estimate", "Actions"],
-        footerRow: ["Name", "Price Target", "Status", "Time Estimate", "Actions"],
+        headerRow: ["Name", "Price", "Status", "Time Estimate", "Actions"],
+        footerRow: ["Name", "Price", "Status", "Time Estimate", "Actions"],
         dataRows: [
                 ]
     })
@@ -66,9 +66,9 @@ export const App = () => {
         catch(err){
             console.log('Session Expired Info Fetch failed')
             //localStorage.removeItem('BSIdToken')
-            if(err.response.status = 403){
-                history.push('/auth/login')
-            }
+            // if(err.response.status = 403){
+            //     history.push('/auth/login')
+            // }
             return;
         }
         console.log('Fetching User Info')

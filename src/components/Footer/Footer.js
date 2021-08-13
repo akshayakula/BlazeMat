@@ -1,5 +1,6 @@
 /*eslint-disable*/
 import React from "react";
+import { Link }  from 'react-router-dom';
 import PropTypes from "prop-types";
 import cx from "classnames";
 
@@ -35,39 +36,32 @@ export default function Footer(props) {
         <div className={classes.left}>
           <List className={classes.list}>
             <ListItem className={classes.inlineBlock}>
-              <a href="#home" className={block}>
-                {rtlActive ? "الصفحة الرئيسية" : "Home"}
-              </a>
+              <Link to='/' className={block}>
+                Landing
+              </Link>
             </ListItem>
             <ListItem className={classes.inlineBlock}>
-              <a href="#company" className={block}>
-                {rtlActive ? "شركة" : "Company"}
-              </a>
+            <Link to='/auth/login-page' className={block}>
+                Login
+            </Link>
             </ListItem>
             <ListItem className={classes.inlineBlock}>
-              <a href="#portfolio" className={block}>
-                {rtlActive ? "بعدسة" : "Portfolio"}
-              </a>
-            </ListItem>
-            <ListItem className={classes.inlineBlock}>
-              <a href="#blog" className={block}>
-                {rtlActive ? "مدونة" : "Blog"}
-              </a>
+              <Link to='/auth/register-page' className={block}>
+                Register
+              </Link>
             </ListItem>
           </List>
         </div>
         <p className={classes.right}>
           &copy; {1900 + new Date().getYear()}{" "}
           <a
-            href="https://www.creative-tim.com?ref=mdpr-footer"
+            href="https://www.blazesell.com"
             className={anchor}
             target="_blank"
           >
-            {rtlActive ? "توقيت الإبداعية" : "Creative Tim"}
+            Blazesell
           </a>
-          {rtlActive
-            ? ", مصنوعة مع الحب لشبكة الإنترنت أفضل"
-            : ", made with love for a better web"}
+          , Inc.
         </p>
       </div>
     </footer>

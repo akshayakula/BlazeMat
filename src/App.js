@@ -108,6 +108,11 @@ export const App = () => {
             tempListing.push(element.info.time_estimate)
             tempListing.push(element.id)
             tempListing.push(element.info.ImgUrls[0])
+            tempListing.push(element.info.ImgUrls[1])
+            tempListing.push(element.info.ImgUrls[2])
+            tempListing.push(element.info.ImgUrls[3])
+            tempListing.push(element.info.ImgUrls[4])
+
             // console.log(tempListing)
             arrListings.push(tempListing)
         })

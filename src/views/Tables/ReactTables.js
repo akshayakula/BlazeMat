@@ -1,5 +1,6 @@
 import React, {useContext, useState, useEffect} from "react";
 import { useHistory } from "react-router-dom"
+import { Carousel } from 'react-responsive-carousel'
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 // @material-ui/icons
@@ -18,6 +19,8 @@ import CardHeader from "components/Card/CardHeader.js";
 import ReactTable from "components/ReactTable/ReactTable.js";
 import SweetAlert from "react-bootstrap-sweetalert";
 import axios from "axios"
+import ArtTrack from "@material-ui/icons/ArtTrack";
+
 import { dataTable } from "variables/general.js";
 import { UserContext } from "../../UserContext"
 import { cardTitle } from "assets/jss/material-dashboard-pro-react.js";
@@ -53,6 +56,33 @@ export default function ReactTables() {
     setAlert(null);
   };
 
+  const htmlAlert = (name, offer, status, time, img0, img1, img2, img3, img4) => {
+    setAlert(
+      <SweetAlert
+        style={{ display: "block", marginTop: "-100px" }}
+        title="HTML example"
+        onConfirm={() => hideAlert()}
+        onCancel={() => hideAlert()}
+        confirmBtnCssClass={classes.button + " " + classes.success}
+      >
+        name:{name}<br/>
+        offer:{offer}<br/>
+        status:{status}<br/>
+        <Carousel showArrows={true}>
+          <div>
+              <img src={img0} />
+          </div>
+        </Carousel>
+        time:{time}<br/>
+        img0:{img0}<br/>
+        img1:{img1}<br/>
+        img2:{img2}<br/>
+        img3:{img3}<br/>
+        img4:{img4}<br/>
+      </SweetAlert>
+    );
+  };
+
   const alertAcceptCancelReject = (price, time, docId) => {
     console.log(price)
     setAlert(
@@ -74,6 +104,7 @@ export default function ReactTables() {
       </SweetAlert>
     );
   };
+
   const AcceptOffer = async (docId) => {
 
     const headers = {
@@ -213,7 +244,11 @@ export default function ReactTables() {
         tempListing.push(element.info.status)
         tempListing.push(element.info.time_estimate)
         tempListing.push(element.id)
-        tempListing.push(element.info.imageUrls)
+        tempListing.push(element.info.ImgUrls[0])
+        tempListing.push(element.info.ImgUrls[1])
+        tempListing.push(element.info.ImgUrls[2])
+        tempListing.push(element.info.ImgUrls[3])
+        tempListing.push(element.info.ImgUrls[4])
         // console.log(tempListing)
         arrListings.push(tempListing)
     })
@@ -243,6 +278,11 @@ export default function ReactTables() {
               </Button> : null}
 
               {/* use this button to remove the data row */}
+              <Button color="transparent" simple justIcon
+                      onClick={event => htmlAlert(prop[0], prop[1], prop[2], prop[3], prop[5], prop[6], prop[7], prop[8], prop[9])}
+              >
+                    <ArtTrack className={classes.underChartIcons} />
+              </Button>
               <Button
                 justIcon
                 round
@@ -282,6 +322,11 @@ export default function ReactTables() {
                 Check Offer
               </Button> : null}
 
+              <Button color="transparent" simple justIcon
+                      onClick={event => htmlAlert(prop[0], prop[1], prop[2], prop[3], prop[5], prop[6], prop[7], prop[8], prop[9])}
+                      >
+                    <ArtTrack className={classes.underChartIcons} />
+              </Button>
               {/* use this button to remove the data row */}
               <Button
                 justIcon

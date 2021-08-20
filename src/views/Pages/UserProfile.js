@@ -152,7 +152,7 @@ export default function UserProfile() {
   const [city, setCity] = useState(info.city)
   const [street, setStreet] = useState(info.street)
   const [alert, setAlert] = useState(null);
-
+  const [first, setFirst] = useState(true)
   // const baseInfo = 
 
   const [savedInfo, setSavedInfo] = useState({
@@ -164,15 +164,48 @@ export default function UserProfile() {
     alert: alert
   })
 
-  useEffect( () =>{
+  const fetchUserInfo = async () => {
+    console.log("FETCHING INFO")
 
-    setZipcode(info.zip_code)
-    setfirstName(info.firstName)
-    setlastName(info.lastName)
-    setCity(info.city)
-    setStreet(info.street)
+    const headers = {
+        headers: {
+          'Authorization': localStorage.getItem('BSIdToken')
+        }
+    }
 
-  }, [info])
+    let r;
+    try{
+        r = await axios.get(`${api_url}/userInfo`,headers)
+        
+        
+    }
+    catch(err){
+        console.log('Session Expired Info Fetch failed')
+        //localStorage.removeItem('BSIdToken')
+        // if(err.response.status = 403){
+            history.push('/auth/login')
+        // }
+        return;
+    }
+    console.log('Fetching User Info')
+    // //console.log(r.data
+    setInfo(r.data)
+    setZipcode(r.data.zip_code)
+    setfirstName(r.data.firstName)
+    setlastName(r.data.lastName)
+    setCity(r.data.city)
+    setStreet(r.data.street)
+  }
+
+  // useEffect( () =>{
+
+  //   setZipcode(info.zip_code)
+  //   setfirstName(info.firstName)
+  //   setlastName(info.lastName)
+  //   setCity(info.city)
+  //   setStreet(info.street)
+
+  // }, [info])
 
 
   const classes = useStyles();
@@ -247,6 +280,15 @@ export default function UserProfile() {
     }))
     successAlert()
   }
+
+  useEffect( () => {
+    
+    if(first){
+    fetchUserInfo()
+    }
+    setFirst(false)
+
+  })
 
 
 

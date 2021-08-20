@@ -20,6 +20,7 @@
     "react-datetime": "3.0.4",
     "react-dom": "17.0.2",
     "react-dropzone": "^11.3.4",
+    "react-image-gallery": "^1.2.7",
     "react-jvectormap": "0.0.16",
     "react-responsive-carousel": "^3.2.20",
     "react-router-dom": "5.2.0",

@@ -1,5 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useHistory} from 'react-router-dom'
+import { Carousel } from 'react-responsive-carousel'
+import ImageGallery from 'react-image-gallery';
 // react plugin for creating charts
 // import ChartistGraph from "react-chartist";
 // react plugin for creating vector maps
@@ -9,6 +11,8 @@ import { Link, useHistory} from 'react-router-dom'
 import { makeStyles } from "@material-ui/core/styles";
 import Tooltip from "@material-ui/core/Tooltip";
 import Icon from "@material-ui/core/Icon";
+import Close from "@material-ui/icons/Close";
+
 
 // @material-ui/icons
 // import ContentCopy from "@material-ui/icons/ContentCopy";
@@ -36,6 +40,9 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
+import alertStyles from "assets/jss/material-dashboard-pro-react/views/sweetAlertStyle.js";
+import SweetAlert from "react-bootstrap-sweetalert";
+
 import axios from "axios"
 
 // import {
@@ -75,17 +82,130 @@ import { HeadsetMic } from "@material-ui/icons";
 
 const useStyles = makeStyles(styles);
 const api_url = process.env.REACT_APP_API_URL;
+const useAlertStyles = makeStyles(alertStyles)
 
 
 export default function Dashboard() {
   
   const {info, listings, setListings} = useContext(UserContext)
+  const alertClasses = useAlertStyles();
   const classes = useStyles();
-  let history = useHistory()
+  let history = useHistory();
+  const [alert, setAlert] = useState(null);
 
   const [item1, setItem1] = useState(listings.dataRows[0])
   const [item2, setItem2] = useState(listings.dataRows[1])
   const [item3, setItem3] = useState(listings.dataRows[2])
+  const [first, setFirst] = useState(true)
+  // let first = true;
+
+  const warningWithConfirmAndCancelMessage = (docId) => {
+    setAlert(
+      <SweetAlert
+        warning
+        style={{ display: "block", marginTop: "-100px" }}
+        title="Are you sure?"
+        onConfirm={() => removeListing(docId)}
+        onCancel={() => cancelDelete()}
+        confirmBtnCssClass={classes.button + " " + classes.success}
+        cancelBtnCssClass={classes.button + " " + classes.danger}
+        confirmBtnText="Yes, delete it!"
+        cancelBtnText="Cancel"
+        showCancel
+      >
+        You will not be able to undo this!
+      </SweetAlert>
+    );
+  };
+
+  const htmlAlert = (name, offer, status, time, img0, img1, img2, img3, img4) => {
+    const images = [
+      {
+        original: 'https://picsum.photos/id/1018/1000/600/',
+      },
+      {
+        original: 'https://picsum.photos/id/1015/1000/600/',
+      },
+      {
+        original: 'https://picsum.photos/id/1019/1000/600/',
+      },
+    ];
+    
+    
+    setAlert(
+      <SweetAlert
+        style={{ display: "block", marginTop: "-100px" }}
+        title="HTML example"
+        onConfirm={() => hideAlert()}
+        onCancel={() => hideAlert()}
+        confirmBtnCssClass={classes.button + " " + classes.success}
+      >
+        name:{name}<br/>
+        offer:{offer}<br/>
+        status:{status}<br/>
+        <ImageGallery items={images} />
+        time:{time}<br/>
+      </SweetAlert>
+    );
+  };
+
+  const cancelDelete = () => {
+    setAlert(
+      <SweetAlert
+        danger
+        style={{ display: "block", marginTop: "-100px" }}
+        title="Cancelled"
+        onConfirm={() => hideAlert()}
+        onCancel={() => hideAlert()}
+        confirmBtnCssClass={classes.button + " " + classes.success}
+      >
+        Your Listing Has Not Been Deleted
+      </SweetAlert>
+    );
+  };
+
+  const removeListing = async (docId) => {
+    const headers = {
+      headers: {
+        'Authorization': localStorage.getItem('BSIdToken')
+      }
+    }
+
+    const payload = {
+      "docId": docId
+    }
+
+    let r;
+    try{
+      r = await axios.post(`${api_url}/removeListing`,payload , headers)
+    }
+    catch (err) {
+      console.log(err)
+      history.push('/auth/login')
+    }
+
+    fetchUserListings()
+    successAlert()
+
+  }
+
+  const hideAlert = () => {
+    setAlert(null);
+  };
+
+  const successAlert = (e) => {
+    setAlert(
+      <SweetAlert
+        success
+        style={{ display: "block", marginTop: "-100px"}}
+        title="Item Deleted"
+        onConfirm={() => hideAlert()}
+        onCancel={() => hideAlert()}
+        confirmBtnCssClass={alertClasses.button + " " + alertClasses.success}
+      >
+      </SweetAlert>
+    );
+  };
 
   const fetchUserListings = async () => {
     console.log("TABLES FETCHING Listings")
@@ -109,6 +229,8 @@ export default function Dashboard() {
         return; 
     }
 
+
+
     console.log('Fetching User Listings')
     //console.log(r.data.data)
     let arrListings = [];
@@ -130,19 +252,26 @@ export default function Dashboard() {
 
     const newListings = listings
     newListings.dataRows = arrListings
-    setListings(newListings)
+    // setListings(newListings)
   }
   
   useEffect( () => {
     
+    if(first){
     setItem1(listings.dataRows[0])
     setItem2(listings.dataRows[1])
     setItem3(listings.dataRows[2])
     fetchUserListings()
+    }
+    setFirst(false)
+
   })
 
   return (
     <div>
+
+      <div className={classes.sweetAlert}> {alert} </div>
+
       <GridContainer>
         <GridItem xs={12} sm={6} md={6} lg={3}>
           <Card>
@@ -209,7 +338,7 @@ export default function Dashboard() {
           </Card>
         </GridItem>
       }
-
+ 
         <GridItem xs={12} sm={12} md={4}>
           {item1 ? <Card product className={classes.cardHover}>
             <CardHeader image className={classes.cardHeaderHover}>
@@ -225,7 +354,7 @@ export default function Dashboard() {
                   placement="bottom"
                   classes={{ tooltip: classes.tooltip }}
                 >
-                  <Button color="transparent" simple justIcon>
+                  <Button color="transparent" simple justIcon onClick={()=>htmlAlert(item1[0], item1[1], item1[2], item1[3], item1[5],item1[6],item1[7],item1[8],item1[9])}>
                     <ArtTrack className={classes.underChartIcons} />
                   </Button>
                 </Tooltip>
@@ -235,7 +364,7 @@ export default function Dashboard() {
                   placement="bottom"
                   classes={{ tooltip: classes.tooltip }}
                 >
-                  <Button color="success" simple justIcon>
+                  <Button color="success" simple justIcon onClick={()=>fetchUserListings()}>
                     <Refresh className={classes.underChartIcons} />
                   </Button>
                 </Tooltip>
@@ -245,8 +374,9 @@ export default function Dashboard() {
                   placement="bottom"
                   classes={{ tooltip: classes.tooltip }}
                 >
-                  <Button color="danger" simple justIcon>
-                    <Edit className={classes.underChartIcons} />
+                  <Button color="danger" simple justIcon
+                  onClick={(event) => {warningWithConfirmAndCancelMessage(item1[4])}}>
+                    <Close className={classes.underChartIcons}/>
                   </Button>
                 </Tooltip>
               </div>
@@ -286,17 +416,17 @@ export default function Dashboard() {
                   placement="bottom"
                   classes={{ tooltip: classes.tooltip }}
                 >
-                  <Button color="transparent" simple justIcon>
+                  <Button color="transparent" simple justIcon onClick={()=>htmlAlert(item1[0], item1[1], item1[2], item1[3], item1[5],item1[6],item1[7],item1[8],item1[9])}>
                     <ArtTrack className={classes.underChartIcons} />
                   </Button>
                 </Tooltip>
                 <Tooltip
                   id="tooltip-top"
-                  title="Edit"
+                  title="Refresh"
                   placement="bottom"
                   classes={{ tooltip: classes.tooltip }}
                 >
-                  <Button color="success" simple justIcon>
+                  <Button color="success" simple justIcon onClick={()=>fetchUserListings()}>
                     <Refresh className={classes.underChartIcons} />
                   </Button>
                 </Tooltip>
@@ -306,8 +436,8 @@ export default function Dashboard() {
                   placement="bottom"
                   classes={{ tooltip: classes.tooltip }}
                 >
-                  <Button color="danger" simple justIcon>
-                    <Edit className={classes.underChartIcons} />
+                  <Button color="danger" simple justIcon onClick={(event) => {warningWithConfirmAndCancelMessage(item2[4])} }>
+                    <Close className={classes.underChartIcons}/>
                   </Button>
                 </Tooltip>
               </div>
@@ -346,17 +476,17 @@ export default function Dashboard() {
                   placement="bottom"
                   classes={{ tooltip: classes.tooltip }}
                 >
-                  <Button color="transparent" simple justIcon>
+                  <Button color="transparent" simple justIcon onClick={()=>htmlAlert(item1[0], item1[1], item1[2], item1[3], item1[5],item1[6],item1[7],item1[8],item1[9])}>
                     <ArtTrack className={classes.underChartIcons} />
                   </Button>
                 </Tooltip>
                 <Tooltip
                   id="tooltip-top"
-                  title="Edit"
+                  title="Refresh"
                   placement="bottom"
                   classes={{ tooltip: classes.tooltip }}
                 >
-                  <Button color="success" simple justIcon>
+                  <Button color="success" simple justIcon onClick={(event)=>{fetchUserListings()}}>
                     <Refresh className={classes.underChartIcons} />
                   </Button>
                 </Tooltip>
@@ -366,8 +496,8 @@ export default function Dashboard() {
                   placement="bottom"
                   classes={{ tooltip: classes.tooltip }}
                 >
-                  <Button color="danger" simple justIcon>
-                    <Edit className={classes.underChartIcons} />
+                  <Button color="danger" simple justIcon onClick={(event) => {warningWithConfirmAndCancelMessage(item3[4])} }>
+                    <Close  className={classes.underChartIcons}/>
                   </Button>
                 </Tooltip>
               </div>

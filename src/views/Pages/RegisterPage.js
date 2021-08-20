@@ -121,7 +121,7 @@ export default function RegisterPage() {
       <SweetAlert
         danger
         style={{ display: "block", marginTop: "-100px" }}
-        title="You gotta change somethings!"
+        title="Fix Form Errors!"
         onConfirm={() => hideAlert()}
         onCancel={() => hideAlert()}
         confirmBtnCssClass={classes.button + " " + classes.success}

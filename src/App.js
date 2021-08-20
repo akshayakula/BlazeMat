@@ -37,6 +37,7 @@ export const App = () => {
         "street": "",
         "city": ""
     }
+    
     const [token, setToken] = useState("")
     const [info, setInfo] = useState(baseInfo)
     const [AppTrigger, setAppTrigger] = useState(false)
@@ -72,9 +73,8 @@ export const App = () => {
             return;
         }
         console.log('Fetching User Info')
-        //console.log(r.data)
-        setInfo(r.data)
-        setAppTrigger(true)
+        // //console.log(r.data)
+        // setInfo(r.data)
     }
 
     const fetchUserListings = async () => {

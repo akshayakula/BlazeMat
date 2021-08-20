@@ -86,10 +86,12 @@ export default function RegisterPage() {
         r = await axios.post(`${api_url}/signup`, userData)
       }
       catch(err) {
-        console.log(err);
         console.log("SIGNUP ERROR");
+        console.log(err.response.data)
+        console.log(err);
         failAlert()
         setErrors(err.response.data);
+        
         return 
       }
       console.log(r.data);
